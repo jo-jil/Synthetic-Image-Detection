@@ -1,0 +1,43 @@
+import os
+import pandas as pd
+import numpy as np
+
+# Find test images directory
+test_dir = None
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    if any(fname.lower().endswith(('.jpg', '.png')) for fname in filenames):
+        test_dir = dirname
+        print(f"Found test images in: {test_dir}")
+        break
+
+if test_dir is None:
+    raise FileNotFoundError("No test images found under /kaggle/input.")
+
+# List test images
+test_images = [f for f in os.listdir(test_dir) if f.lower().endswith(('.jpg', '.png'))]
+
+submission = []
+
+# Generate random predictions
+for img_name in test_images:
+    image_id = img_name.rsplit('.', 1)[0]
+    class_id = 0
+    confidence = np.round(np.random.uniform(0.3, 0.9), 6)
+    x_center = np.round(np.random.uniform(0.1, 0.9), 6)
+    y_center = np.round(np.random.uniform(0.1, 0.9), 6)
+    width = np.round(np.random.uniform(0.1, 0.5), 6)
+    height = np.round(np.random.uniform(0.1, 0.5), 6)
+    prediction_string = f"{class_id} {confidence} {x_center} {y_center} {width} {height}"
+    
+    submission.append({
+        "image_id": image_id,
+        "prediction_string": prediction_string  # <-- lowercase p
+    })
+
+# Create DataFrame
+submission_df = pd.DataFrame(submission)
+
+# Save to CSV
+submission_df.to_csv('/kaggle/working/submission.csv', index=False)
+
+print("✅ Submission file created successfully: /kaggle/working/submission.csv")
